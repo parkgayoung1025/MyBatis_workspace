@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="boardMapper">
+<!-- namespace : 해당 mapper 파일의 고유한 별칭 -->
+<!-- 
+	resultMap type이 board인 하나 생성하고
+	
+	select id 값이 selectListCount, selectList 태그 2개 만들기
+ -->
+	<resultMap type="board" id="boardResultSet">
+		<result column="BOARD_NO" property="boardNo"/>
+		<result column="BOARD_TITLE" property="boardTitle"/>
+		<result column="BOARD_CONTENT" property="boardContent"/>
+		<result column="BOARD_WRITER" property="boardWriter"/>
+		<result column="BOARD_COUNT" property="count"/>
+		<result column="BOARD_CREATEDATE" property="createDate"/>
+		<result column="BOARD_STATUS" property="status"/>
+	</resultMap>
+	
+	<select id="selectListCount" parameterType="board" resultMap="boardResultSet">
+		SELECT COUNT(*) AS COUNT
+		FROM BOARD
+		WHERE STATUS = 'Y'
+	</select>
+	
+	<select id="selectListCount" parameterType="board" resultMap="boardResultSet">
+		SELECT * 	
+		FROM(
+				SELECT ROWNUM RNUM , A.*
+				FROM (
+					SELECT
+					       BOARD_NO,
+					       BOARD_WRITER,
+					       BOARD_TITLE,
+					       BOARD_CONTENT,
+					       COUNT,
+					       CREATE_DATE
+					FROM BOARD B
+					JOIN MEMBER ON (BOARD_WRITER = USER_NO)
+					WHERE B.STATUS = 'Y'
+					ORDER BY CREATE_DATE DESC
+				) A
+			)
+		WHERE RNUM BETWEEN ? AND ?
+	</select>
+</mapper>
